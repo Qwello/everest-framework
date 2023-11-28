@@ -69,7 +69,6 @@ cc_binary(
     copts = ["-std=c++17"],
     visibility = ["//visibility:public"],
     deps = [
-        "@//third-party/bazel:boost_log",
         "@//third-party/bazel:boost_program_options",
         "@com_github_everest_liblog//:liblog",
         "@com_github_fmtlib_fmt//:fmt",
