@@ -305,9 +305,7 @@ impl Runtime {
     pub fn set_subscriber(self: Pin<&Self>, sub_impl: Weak<dyn Subscriber>) {
         *self.sub_impl.write().unwrap() = Some(sub_impl);
         let manifest_json = self.cpp_module.as_ref().unwrap().initialize();
-        println!("#hrapp manifest_json: {:#?}", manifest_json);
         let manifest: schema::Manifest = manifest_json.deserialize();
-        println!("#hrapp manifest: {:#?}", manifest);
 
         // Implement all commands for all of our implementations, dispatch everything to the
         // Subscriber.
