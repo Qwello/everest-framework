@@ -5,25 +5,25 @@ rust_library(
     name = "everestrs",
     srcs = glob(["src/**/*.rs"]),
     edition = "2021",
-    deps =  [
+    visibility = ["//visibility:public"],
+    deps = [
         "@crate_index//:argh",
         "@crate_index//:serde",
         "@crate_index//:serde_json",
         "@crate_index//:thiserror",
         "@cxx.rs//:cxx",
-        "@everest-framework//everestrs/everestrs:everestrs_sys",
         "@everest-framework//everestrs/everestrs:everestrs_bridge",
+        "@everest-framework//everestrs/everestrs:everestrs_sys",
         "@everest-framework//everestrs/everestrs-build:everestrs-build",
     ],
-    visibility = ["//visibility:public"],
 )
 
 run_binary(
     name = "everestrs_bridge/generated",
     srcs = ["src/lib.rs"],
     outs = [
-        "src/lib.rs.h",
         "src/lib.rs.cc",
+        "src/lib.rs.h",
     ],
     args = [
         "$(location src/lib.rs)",
@@ -38,37 +38,41 @@ run_binary(
 cc_library(
     name = "everestrs_bridge",
     srcs = ["src/lib.rs" + ".cc"],
-    deps = [
-        "@everest-framework//everestrs/everestrs:everestrs_sys_include",
-        "@everest-framework//everestrs/everestrs:everestrs_bridge/include",
-        "@everest-framework//:framework",
-    ],
     copts = ["-std=c++17"],
+    linkstatic = 1,
     visibility = ["//visibility:public"],
+    deps = [
+        "@everest-framework//:framework",
+        "@everest-framework//everestrs/everestrs:everestrs_bridge/include",
+        "@everest-framework//everestrs/everestrs:everestrs_sys_include",
+    ],
 )
 
 cc_library(
     name = "everestrs_sys",
     srcs = ["src/everestrs_sys.cpp"],
-    deps = [
-        "@everest-framework//everestrs/everestrs:everestrs_sys_include",
-        "@everest-framework//everestrs/everestrs:everestrs_bridge/include",
-        "@everest-framework//:framework",
-    ],
     copts = ["-std=c++17"],
-    alwayslink = True,
+    linkstatic = 1,
     visibility = ["//visibility:public"],
+    deps = [
+        "@everest-framework//:framework",
+        "@everest-framework//everestrs/everestrs:everestrs_bridge/include",
+        "@everest-framework//everestrs/everestrs:everestrs_sys_include",
+    ],
+    alwayslink = True,
 )
 
 cc_library(
     name = "everestrs_bridge/include",
     hdrs = ["src/lib.rs" + ".h"],
     include_prefix = "everestrs",
+    linkstatic = 1,
 )
 
 cc_library(
     name = "everestrs_sys_include",
     hdrs = ["src/everestrs_sys.hpp"],
-    deps = ["@cxx.rs//:core"],
     include_prefix = "everestrs",
+    linkstatic = 1,
+    deps = ["@cxx.rs//:core"],
 )
