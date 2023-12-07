@@ -6,10 +6,10 @@ pub(crate) trait {{trait.name | title}}ServiceSubscriber: Sync + Send {
    {%- for arg in cmd.arguments %}
    /// `{{arg.name}}`: {{arg.description | replace("\n", " ")}}
    {%- endfor %}
-   {%- if cmd.result -%}
+   {% if cmd.result -%}
    ///
    /// Returns: {{cmd.result.description | replace("\n", " ")}}
-   {% endif %}
+   {% endif -%}
    fn {{cmd.name}}(&self,
       publishers: &ModulePublisher,
    {%- for arg in cmd.arguments %}
@@ -23,9 +23,59 @@ pub(crate) trait {{trait.name | title}}ServiceSubscriber: Sync + Send {
 {% endfor %}
 }
 
+/// Extended interface of [{{trait.name | title}}ServiceSubscriber]
+pub(crate) trait {{trait.name | title}}ServiceSubscriberExt: Sync + Send {
+{%- for cmd in trait.cmds %}
+   /// {{cmd.description | replace("\n", " ")}}
+   ///
+   /// `name`: The name of the interface.
+   {%- for arg in cmd.arguments %}
+   /// `{{arg.name}}`: {{arg.description | replace("\n", " ")}}
+   {%- endfor %}
+   {% if cmd.result -%}
+   ///
+   /// Returns: {{cmd.result.description | replace("\n", " ")}}
+   {% endif -%}
+   fn {{cmd.name}}_named<'a>(&self,
+      publishers: &ModulePublisher,
+      name: &'a str,
+   {%- for arg in cmd.arguments %}
+      {{arg.name | identifier }}: {{arg.data_type.name}},
+   {%- endfor %}
+   ) -> ::everestrs::Result<{%- if cmd.result -%}
+      {{cmd.result.data_type.name}}
+   {%- else -%}
+      ()
+   {%- endif -%}>;
+{% endfor %}
+}
+
+impl<S: {{trait.name | title}}ServiceSubscriber> {{trait.name | title}}ServiceSubscriberExt for S {
+   {%- for cmd in trait.cmds %}
+   fn {{cmd.name}}_named<'a>(&self,
+      publishers: &ModulePublisher,
+      name: &'a str,
+   {%- for arg in cmd.arguments %}
+      {{arg.name | identifier }}: {{arg.data_type.name}},
+   {%- endfor %}
+   ) -> ::everestrs::Result<{%- if cmd.result -%}
+      {{cmd.result.data_type.name}}
+   {%- else -%}
+      ()
+   {%- endif -%}> {
+      self.{{cmd.name}}(publishers, 
+      {%- for arg in cmd.arguments %}
+         {{arg.name | identifier }},
+      {%- endfor %}
+      )
+   }
+{% endfor %}
+}
+
 fn dispatch_command_to_{{ trait.name | snake }}(
    publishers: &ModulePublisher,
-   service: &dyn {{trait.name | title}}ServiceSubscriber,
+   service: &dyn {{trait.name | title}}ServiceSubscriberExt,
+   implementation_id: &str,
    name: &str,
    mut parameters: ::std::collections::HashMap<String, ::serde_json::Value>,
 ) -> ::everestrs::Result<::serde_json::Value> {
@@ -39,12 +89,12 @@ fn dispatch_command_to_{{ trait.name | snake }}(
           )
           .map_err(|_| ::everestrs::Error::InvalidArgument("{{ arg.name }}"))?;
 {%- endfor %}
-       let retval = service.{{ cmd.name }}(publishers, 
+       let retval = service.{{ cmd.name }}_named(publishers, implementation_id,
 {%- for arg in cmd.arguments %}
             {{ arg.name | identifier }},
 {%- endfor %}
        )?;
-       serde_json::to_value(retval).map_err(|e| ::everestrs::Error::MismatchedType("Failed to dispacth".to_string()))
+       serde_json::to_value(retval).map_err(|e| ::everestrs::Error::MismatchedType("Failed to dispatch".to_string()))
     },
 {%- endfor %}
       _ => Err(::everestrs::Error::InvalidArgument("Unknown command called.")),
