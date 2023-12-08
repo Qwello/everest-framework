@@ -1,29 +1,13 @@
 /// {{trait.description | replace("\n", " ")}}
 pub(crate) trait {{trait.name | title}}ClientSubscriber: Sync + Send {
 {% for var in trait.vars %}
-   fn on_{{ var.name | snake }}(&self, publishers: &ModulePublisher, value: {{ var.data_type.name }});
-{% endfor %}
-}
-
-/// Extended interface of [{{trait.name | title}}ClientSubscriber]
-pub(crate) trait {{trait.name | title}}ClientSubscriberExt: Sync + Send {
-{% for var in trait.vars %}
-   fn on_{{ var.name | snake }}_named<'a>(&self, publishers: &ModulePublisher, name: &'a str, value: {{ var.data_type.name }});
-{% endfor %}
-}
-
-impl<S: {{trait.name | title}}ClientSubscriber> {{trait.name | title}}ClientSubscriberExt for S {
-{% for var in trait.vars %}
-   fn on_{{ var.name | snake }}_named<'a>(&self, publishers: &ModulePublisher, name: &'a str, value: {{ var.data_type.name }}) {
-      self.on_{{ var.name | snake }}(publishers, value)
-   }
+   fn on_{{ var.name | snake }}(&self, context: &Context, value: {{ var.data_type.name }});
 {% endfor %}
 }
 
 fn dispatch_variable_to_{{ trait.name | snake }}(
-   publishers: &ModulePublisher,
-   client_subscriber: &dyn {{trait.name | title}}ClientSubscriberExt,
-   implementation_id: &str,
+   context: &Context,
+   client_subscriber: &dyn {{trait.name | title}}ClientSubscriber,
    name: &str,
    value: ::serde_json::Value,
 ) -> ::everestrs::Result<()> {
@@ -32,7 +16,7 @@ fn dispatch_variable_to_{{ trait.name | snake }}(
    "{{ var.name }}" => {
    let v: {{ var.data_type.name }} = ::serde_json::from_value(value)
          .map_err(|_| ::everestrs::Error::InvalidArgument("{{ var.name }}"))?;
-         client_subscriber.on_{{ var.name | snake }}_named(publishers, implementation_id, v);
+         client_subscriber.on_{{ var.name | snake }}(context, v);
                 Ok(())
     },
 {%- endfor %}
