@@ -51,7 +51,7 @@ fn find_libs_in_everest_framework(root: &Path) -> Option<Libraries> {
     }
 }
 
-fn find_libs_in_lib_dir(lib_dir: &Path) -> Option<Libraries> {
+fn find_libs_in_dir(lib_dir: &Path) -> Option<Libraries> {
     let everestrs_sys = lib_dir.join("libeverestrs_sys.a");
     let framework = lib_dir.join("libframework.so");
     if everestrs_sys.exists() && framework.exists() {
@@ -67,7 +67,7 @@ fn find_libs_in_lib_dir(lib_dir: &Path) -> Option<Libraries> {
 /// Returns the Libraries path if this is an EVerest workspace where make install was run in
 /// everest-core/build or None if not.
 fn find_libs_in_everest_core_build_dist(root: &Path) -> Option<Libraries> {
-    find_libs_in_lib_dir(&root.join("everest-core/build/dist/lib"))
+    find_libs_in_dir(&root.join("everest-core/build/dist/lib"))
 }
 
 /// Takes a path to a library like `libframework.so` and returns the name for the linker, aka
@@ -107,7 +107,7 @@ fn main() {
     }
 
     let libs = match env::var("EVEREST_LIB_DIR") {
-        Ok(p) => find_libs_in_lib_dir(&Path::new(&p)),
+        Ok(p) => find_libs_in_dir(&Path::new(&p)),
         Err(_) => find_libs_in_everest_workspace(),
     };
 
