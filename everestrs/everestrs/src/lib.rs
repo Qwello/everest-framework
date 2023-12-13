@@ -242,7 +242,7 @@ impl Runtime {
             .unwrap()
             .upgrade()
             .unwrap()
-            .handle_command(impl_id, name, parameters.unwrap_or_else(|| HashMap::new()))
+            .handle_command(impl_id, name, parameters.unwrap_or_default())
             .unwrap();
         ffi::JsonBlob::from_vec(serde_json::to_vec(&blob).unwrap())
     }
