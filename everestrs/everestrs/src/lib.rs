@@ -248,7 +248,10 @@ impl Runtime {
     }
 
     fn handle_variable(&self, impl_id: &str, name: &str, json: ffi::JsonBlob) {
-        debug!("handle_variable: {impl_id}, {name}, '{:?}'", json.as_bytes());
+        debug!(
+            "handle_variable: {impl_id}, {name}, '{:?}'",
+            json.as_bytes()
+        );
         self.sub_impl
             .read()
             .unwrap()
