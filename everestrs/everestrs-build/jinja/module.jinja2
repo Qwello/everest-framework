@@ -105,8 +105,8 @@ impl ::everestrs::Subscriber for Module {
         &self,
         implementation_id: &str,
         name: &str,
-        parameters: ::std::collections::HashMap<String, serde_json::Value>,
-    ) -> ::everestrs::Result<serde_json::Value> {
+        parameters: ::std::collections::HashMap<String, __serde_json::Value>,
+    ) -> ::everestrs::Result<__serde_json::Value> {
         let context = Context {
             publisher: &self.publisher,
             name: implementation_id,
@@ -127,7 +127,7 @@ impl ::everestrs::Subscriber for Module {
         &self,
         implementation_id: &str,
         name: &str,
-        value: serde_json::Value,
+        value: __serde_json::Value,
     ) -> ::everestrs::Result<()> {
         let context = Context {
             publisher: &self.publisher,
