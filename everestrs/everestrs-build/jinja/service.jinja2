@@ -27,13 +27,13 @@ fn dispatch_command_to_{{ trait.name | snake }}(
    context: &Context,
    service: &dyn {{trait.name | title}}ServiceSubscriber,
    name: &str,
-   mut parameters: ::std::collections::HashMap<String, ::__serde_json::Value>,
-) -> ::everestrs::Result<::__serde_json::Value> {
+   mut parameters: ::std::collections::HashMap<String, __serde_json::Value>,
+) -> ::everestrs::Result<__serde_json::Value> {
    match name {
 {%- for cmd in trait.cmds %}
    "{{ cmd.name }}" => {
 {%- for arg in cmd.arguments %}
-      let {{ arg.name | identifier }}: {{ arg.data_type.name }} = ::__serde_json::from_value(
+      let {{ arg.name | identifier }}: {{ arg.data_type.name }} = __serde_json::from_value(
          parameters.remove("{{ arg.name }}")
             .ok_or(::everestrs::Error::MissingArgument("{{ arg.name }}"))?,
           )

@@ -13,8 +13,8 @@ use std::sync::Weak;
 use thiserror::Error;
 
 // Reexport everything so the clients can use it.
-pub use serde_json as __serde_json;
-pub use serde as __serde;
+pub use serde_json;
+pub use serde;
 
 #[derive(Error, Debug)]
 pub enum Error {
