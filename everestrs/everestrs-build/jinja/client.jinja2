@@ -24,12 +24,18 @@ fn dispatch_variable_to_{{ trait.name | snake }}(
    }
 }
 
+pub(crate) mod __mockall_{{trait.name | snake }} {
+
 #[derive(Clone)]
 pub(crate) struct {{trait.name | title }}ClientPublisher {
-    implementation_id: &'static str,
-    runtime: ::std::pin::Pin<::std::sync::Arc<::everestrs::Runtime>>,
+   #[cfg(not(test))]
+    pub(super) implementation_id: &'static str,
+
+   #[cfg(not(test))]
+   pub(super) runtime: ::std::pin::Pin<::std::sync::Arc<::everestrs::Runtime>>,
 }
 
+#[everestrs::mockall::automock]
 impl {{trait.name | title }}ClientPublisher {
 {%- for cmd in trait.cmds %}
    /// {{cmd.description | replace("\n", " ")}}
@@ -61,4 +67,9 @@ impl {{trait.name | title }}ClientPublisher {
 
       }
 {% endfor %}
+
 }
+
+}
+#[everestrs::mockall_double::double]
+pub(crate) use __mockall_{{trait.name | snake }}::{{trait.name | title }}ClientPublisher;
