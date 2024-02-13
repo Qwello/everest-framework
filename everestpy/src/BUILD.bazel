@@ -14,12 +14,8 @@ py_library(
     name = "framework",
     data = [":everestpy.so"],
     srcs = glob(["everest/framework/**/*.py",]),
-    # hdrs = glob(["everest/framework/**/*.pyi"]),
     visibility = [
         "//visibility:public",
     ],
   	imports = ["."],
 )
-
-
-# pybind_extension()
