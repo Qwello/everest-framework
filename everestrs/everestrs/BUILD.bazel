@@ -11,14 +11,10 @@ rust_library(
         "@crate_index//:serde",
         "@crate_index//:serde_json",
         "@crate_index//:thiserror",
-        "@crate_index//:mockall",
         "@cxx.rs//:cxx",
         "@everest-framework//everestrs/everestrs:everestrs_sys",
         "@everest-framework//everestrs/everestrs:everestrs_bridge",
         "@everest-framework//everestrs/everestrs-build:everestrs-build",
-    ],
-    proc_macro_deps = [
-        "@crate_index//:mockall_double",
     ],
     visibility = ["//visibility:public"],
 )
