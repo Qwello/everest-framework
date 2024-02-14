@@ -59,8 +59,9 @@ impl {{trait.name | title }}ClientPublisher {
             "{{arg.name}}": {{arg.name | identifier}},
 {%- endfor %}
         });
-         let blob = self.runtime.call_command(self.implementation_id, "{{ cmd.name }}", &args);
-         return __serde_json::from_value(blob).map_err(|_| ::everestrs::Error::InvalidArgument("return_value"));
+        let blob = self.runtime.call_command(self.implementation_id, "{{ cmd.name }}", &args);
+        __serde_json::from_value(blob).map_err(|_| ::everestrs::Error::InvalidArgument("return_value"))
+
       }
 {% endfor %}
 

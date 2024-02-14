@@ -74,7 +74,6 @@ impl Module {
       {{ require.implementation_id | identifier }}: ::std::sync::Arc<dyn {{require.interface | title}}ClientSubscriber>,
 {% endfor %}
     ) -> ::std::sync::Arc<Self> {
-
         let runtime = ::everestrs::Runtime::new();
         let this = ::std::sync::Arc::new(Self {
             on_ready,
