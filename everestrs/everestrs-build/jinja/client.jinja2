@@ -24,18 +24,15 @@ fn dispatch_variable_to_{{ trait.name | snake }}(
    }
 }
 
-pub(crate) mod __mockall_{{trait.name | snake }} {
+pub(crate) mod __mockall_{{trait.name | snake }}_client {
 
 #[derive(Clone)]
 pub(crate) struct {{trait.name | title }}ClientPublisher {
-   #[cfg(not(test))]
-    pub(super) implementation_id: &'static str,
-
-   #[cfg(not(test))]
+   pub(super) implementation_id: &'static str,
    pub(super) runtime: ::std::pin::Pin<::std::sync::Arc<::everestrs::Runtime>>,
 }
 
-#[everestrs::mockall::automock]
+#[cfg_attr(feature="mockall", mockall::automock)]
 impl {{trait.name | title }}ClientPublisher {
 {%- for cmd in trait.cmds %}
    /// {{cmd.description | replace("\n", " ")}}
@@ -62,14 +59,13 @@ impl {{trait.name | title }}ClientPublisher {
             "{{arg.name}}": {{arg.name | identifier}},
 {%- endfor %}
         });
-        let blob = self.runtime.call_command(self.implementation_id, "{{ cmd.name }}", &args);
-        __serde_json::from_value(blob).map_err(|_| ::everestrs::Error::InvalidArgument("return_value"))
-
+         let blob = self.runtime.call_command(self.implementation_id, "{{ cmd.name }}", &args);
+         return __serde_json::from_value(blob).map_err(|_| ::everestrs::Error::InvalidArgument("return_value"));
       }
 {% endfor %}
 
 }
 
 }
-#[everestrs::mockall_double::double]
-pub(crate) use __mockall_{{trait.name | snake }}::{{trait.name | title }}ClientPublisher;
+#[cfg_attr(feature="mockall", mockall_double::double)]
+pub(crate) use __mockall_{{trait.name | snake }}_client::{{trait.name | title }}ClientPublisher;
