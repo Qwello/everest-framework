@@ -181,6 +181,10 @@ mod logger {
         }
 
         fn log(&self, record: &log::Record) {
+            // The doc says `log` has to perform the filtering itself.
+            if !self.enabled(record.metadata()) {
+                return;
+            }
             // This mapping should be kept in sync with liblog's
             // Everest::Logging::severity_level.
             let level = match record.level() {
@@ -190,6 +194,7 @@ mod logger {
                 log::Level::Warn => 3,
                 log::Level::Error => 4,
             };
+
             ffi::log2cxx(
                 level,
                 record.line().unwrap_or_default() as i32,
@@ -224,6 +229,7 @@ mod logger {
 
             let logger = Self { level };
             log::set_boxed_logger(Box::new(logger)).unwrap();
+            log::set_max_level(level.to_level_filter());
         }
     }
 }
