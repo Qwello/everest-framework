@@ -37,3 +37,5 @@ private:
 std::unique_ptr<Module> create_module(rust::Str module_name, rust::Str prefix, rust::Str conf);
 
 rust::Vec<RsModuleConfig> get_module_configs(rust::Str module_name, rust::Str prefix, rust::Str conf);
+
+void log2cxx(int level, int line, rust::Str file, rust::Str message);

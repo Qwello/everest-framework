@@ -1,7 +1,8 @@
 #include "everestrs/src/everestrs_sys.hpp"
 #include "everestrs/src/lib.rs.h"
 
-#include "utils/types.hpp"
+#include <everest/logging.hpp>
+#include <utils/types.hpp>
 
 #include <cstdlib>
 #include <stdexcept>
@@ -150,4 +151,11 @@ rust::Vec<RsModuleConfig> get_module_configs(rust::Str module_id, rust::Str pref
     }
 
     return out;
+}
+
+void log2cxx(int level, int line, rust::Str file, rust::Str message) {
+    const auto logging_level = static_cast<::Everest::Logging::severity_level>(level);
+    BOOST_LOG_SEV(::global_logger::get(), logging_level)
+        << boost::log::BOOST_LOG_VERSION_NAMESPACE::add_value("file", std::string{file})
+        << boost::log::BOOST_LOG_VERSION_NAMESPACE::add_value("line", line) << std::string{message};
 }
