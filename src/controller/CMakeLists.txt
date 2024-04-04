@@ -16,6 +16,7 @@ add_executable(controller
     command_api.cpp
     rpc.cpp
     server.cpp
+    transpile_config.cpp
     ${PROJECT_SOURCE_DIR}/lib/formatter.cpp
     ${PROJECT_SOURCE_DIR}/lib/yaml_loader.cpp
 )
@@ -53,7 +54,7 @@ if (EVEREST_INSTALL_ADMIN_PANEL)
 
     FetchContent_Declare(admin-panel
         DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-        URL https://github.com/EVerest/everest-admin-panel/releases/download/v0.1.0/everest-admin-panel.tar.gz
+        URL https://github.com/EVerest/everest-admin-panel/releases/download/v0.2.0/everest-admin-panel.tar.gz
     )
 
     FetchContent_MakeAvailable(admin-panel)
