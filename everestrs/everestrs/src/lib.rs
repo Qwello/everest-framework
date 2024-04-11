@@ -141,6 +141,9 @@ mod ffi {
         /// Publishes the given `blob` under the `implementation_id` and `name`.
         fn publish_variable(self: &Module, implementation_id: &str, name: &str, blob: JsonBlob);
 
+        /// Returns the severity for the cxx logger.
+        fn get_log_level(self: &Module) -> i32;
+
         /// Returns the module config from cpp.
         fn get_module_configs(module_id: &str, prefix: &str, conf: &str) -> Vec<RsModuleConfig>;
 
@@ -167,7 +170,6 @@ impl ffi::JsonBlob {
 /// Very simple logger to use by the Rust modules.
 mod logger {
     use super::ffi;
-    use std::env;
 
     pub(crate) struct Logger {
         level: log::Level,
@@ -210,21 +212,14 @@ mod logger {
         /// Init the logger for everest.
         ///
         /// Don't do this on your own as we must also control some cxx code.
-        /// However, you can set the severity through the env-var
-        /// `EVERESTRS_SEVERITY` to pre-filter logs from Rust. This will reduce
-        /// the number of ffi calls and improve performance.
-        pub(crate) fn init_logger() {
-            let severity = env::var("EVERESTRS_SEVERITY")
-                .unwrap_or("info".to_string())
-                .to_lowercase();
-
-            // Map the string to the severity.
-            let level = match severity.as_str() {
-                "trace" | "verb" => log::Level::Trace,
-                "debug" | "debg" => log::Level::Debug,
-                "info" => log::Level::Info,
-                "warn" | "warning" => log::Level::Warn,
-                _ => log::Level::Error,
+        pub(crate) fn init_logger(module: &ffi::Module) {
+            let level = match module.get_log_level() {
+                0 => log::Level::Trace,
+                1 => log::Level::Debug,
+                2 => log::Level::Info,
+                3 => log::Level::Warn,
+                4 => log::Level::Error,
+                _ => log::Level::Info,
             };
 
             let logger = Self { level };
@@ -379,7 +374,7 @@ impl Runtime {
             &args.conf.to_string_lossy(),
         );
 
-        logger::Logger::init_logger();
+        logger::Logger::init_logger(&cpp_module);
 
         Arc::pin(Self {
             cpp_module,
